@@ -1,0 +1,445 @@
+openapi: 3.0.3
+info:
+  title: Locker APIs
+  description: |-
+    universalmacro
+  contact:
+    email: chenyunda218@gmail.com
+  version: 0.0.1
+servers:
+  - url: https://uat.api.universalmacro.com/core
+  - url: https://api.universalmacro.com/core
+tags:
+  - name: Topic
+paths:
+  /sessions:
+    post:
+      tags:
+        - Session
+      summary: 'Create session'
+      operationId: CreateSession
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+  /merchants/self:
+    get:
+      tags:
+        - Merchant
+      summary: 'Get self merchant'
+      operationId: GetSelfMerchant
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+  /merchants/self/password:
+    put:
+      tags:
+        - Merchant
+      summary: 'Update self password'
+      operationId: UpdateSelfPassword
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordRequest'
+      responses:
+        '204':
+          description: 'Success'
+  /merchants:
+    get:
+      tags:
+        - Merchant
+      summary: 'List merchants'
+      operationId: ListMerchants
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IndexParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/Ordering'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantList'
+    post:
+      tags:
+        - Merchant
+      summary: 'Create merchant'
+      operationId: CreateMerchant
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMerchantRequest'
+      responses:
+        '201':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+  /merchants/{id}:
+    get:
+      tags:
+        - Merchant
+      summary: 'Get merchant'
+      operationId: GetMerchant
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Merchant'
+    put:
+      tags:
+        - Merchant
+      summary: 'Update merchant'
+      operationId: UpdateMerchant
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Merchant'
+      responses:
+        '204':
+          description: 'Success'
+    delete:
+      tags:
+        - Merchant
+      summary: 'Delete merchant'
+      operationId: DeleteMerchant
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      responses:
+        '204':
+          description: 'Success'
+  /merchants/{id}/password:
+    put:
+      tags:
+        - Merchant
+      summary: 'Update merchant password by core admin'
+      operationId: UpdateMerchantPassword
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePasswordRequest'
+      responses:
+        '204':
+          description: 'Success'
+  /merchants/{id}/members:
+    get:
+      tags:
+        - Member
+      summary: 'List members'
+      operationId: ListMembers
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ID'
+        - $ref: '#/components/parameters/IndexParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/Ordering'
+      responses:
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberList'
+    post:
+      tags:
+        - Member
+      summary: 'Create member'
+      operationId: CreateMember
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Member'
+      responses:
+        '201':
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+  /verification:
+    post:
+      tags:
+        - Verification
+      summary: 'Send verification code'
+      operationId: SendVerificationCode
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVerificationCodeRequest'
+      responses:
+        '204':
+          description: 'Success'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: ApiKey
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreateVerificationCodeRequest:
+      type: object
+      properties:
+        merchantId:
+          type: string
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+    Member:
+      type: object
+      required:
+        - id
+        - merchantId
+        - name
+        - phoneNumber
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        merchantId:
+          type: string
+        name:
+          type: string
+        gender:
+          type: string
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        createdAt:
+          type: integer
+          format: int64
+        updatedAt:
+          type: integer
+          format: int64
+    MemberList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    CreateMerchantRequest:
+      type: object
+      required:
+        - shortMerchantId
+        - account
+        - password
+      properties:
+        shortMerchantId:
+          type: string
+        account:
+          type: string
+        password:
+          type: string
+    Merchant:
+      type: object
+      required:
+        - id
+        - shortMerchantId
+        - account
+        - name
+        - description
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        shortMerchantId:
+          type: string
+        account:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: integer
+          format: int64
+        updatedAt:
+          type: integer
+          format: int64
+    MerchantList:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Merchant'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    PhoneNumber:
+      type: object
+      required:
+        - countryCode
+        - number
+      properties:
+        countryCode:
+          type: string
+        number:
+          type: string
+    CreateSessionRequest:
+      description: 'Login request'
+      type: object
+      properties:
+        shortMerchantId:
+          type: string
+        account:
+          type: string
+        password:
+          type: string
+    CreateAdminRequest:
+      description: 'Create admin request schema'
+      required:
+        - account
+        - password
+      type: object
+      properties:
+        account:
+          type: string
+        password:
+          type: string
+        role:
+          $ref: '#/components/schemas/Role'
+    Session:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+    Role:
+      type: string
+      enum: [ROOT, ADMIN]
+    UpdatePasswordRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+        oldPassword:
+          type: string
+    Ordering:
+      description: 'Ordering'
+      type: string
+      enum: [ASCENDING, DESCENDING]
+    Pagination:
+      description: 'Pagination'
+      type: object
+      required:
+        - index
+        - limit
+        - total
+      properties:
+        index:
+          type: integer
+          format: int64
+          description: 'Current page'
+        limit:
+          type: integer
+          format: int64
+          description: 'Amount per page'
+        total:
+          type: integer
+          format: int64
+          description: 'Total page'
+  parameters:
+    Ordering:
+      name: ordering
+      description: 'ASCENDING or DESCENDING'
+      in: query
+      schema:
+        $ref: '#/components/schemas/Ordering'
+    IndexParam:
+      name: index
+      in: query
+      description: 'Current page index'
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    LimitParam:
+      name: limit
+      in: query
+      description: 'Total pages'
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    ID:
+      in: path
+      name: id
+      schema:
+        type: string
+      required: true
+    StartAt:
+      in: query
+      name: startAt
+      schema:
+        type: integer
+        format: int64
+    EndAt:
+      in: query
+      name: endAt
+      schema:
+        type: integer
+        format: int64
